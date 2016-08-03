@@ -132,4 +132,12 @@ public class User {
     public void setUpdatedtime(Date updatedtime) {
         this.updatedtime = updatedtime;
     }
+
+	@Override
+	public String toString() {
+		return "User [id=" + id + ", memberid=" + memberid + ", account=" + account + ", password=" + password
+				+ ", gender=" + gender + ", phone=" + phone + ", qq=" + qq + ", qqname=" + qqname + ", sina=" + sina
+				+ ", sinaname=" + sinaname + ", signature=" + signature + ", createdtime=" + createdtime
+				+ ", updatedtime=" + updatedtime + "]";
+	} 
 }

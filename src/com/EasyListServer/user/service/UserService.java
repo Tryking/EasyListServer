@@ -31,10 +31,5 @@ public interface UserService {
 	 * @param date
 	 * @return
 	 */
-	List<Event> getEventByDate(String memberId, String date);
-	
-	
-	
-	
-	
+	List<Event> getEventByDate(String memberId, String date);	
 }

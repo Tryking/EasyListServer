@@ -37,6 +37,13 @@ public class userController {
 	@RequestMapping(value="/login",produces = "text/html;charset=UTF-8")
 	@ResponseBody
 	public String loginAndShow(User user){
+//		try {
+//			user.setMemberid(new String(user.getMemberid().getBytes("iso8859-1"),"utf-8"));
+//		} catch (UnsupportedEncodingException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+		
 		LoginReturnBean loginAndShow = userService.loginAndShow(user);
 		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").disableHtmlEscaping().create();
 		String json = gson.toJson(loginAndShow);

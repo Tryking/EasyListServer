@@ -114,7 +114,7 @@ public class UesrServiceImpl implements UserService {
 		EventExample.Criteria criteria = example.createCriteria();
 		criteria.andMemberidEqualTo(memberid);
 		criteria.andDateEqualTo(date);
-		criteria.andRecordEqualTo(Constants.oneWordSign);// 这个是一句话的
+		criteria.andEventtypesEqualTo(Integer.parseInt(Constants.oneWordSign));// 这个是一句话的
 		List<Event> list = eventMapper.selectByExample(example);
 		if (list.size() == 0) {
 			return "";
@@ -141,6 +141,7 @@ public class UesrServiceImpl implements UserService {
 			EventExample.Criteria delCriteria = example.createCriteria();
 			delCriteria.andMemberidEqualTo(transferData.getMemberId());
 			delCriteria.andDateEqualTo(transferData.getDate());
+			delCriteria.andEventtypesNotEqualTo(Integer.parseInt(Constants.oneWordSign));
 			eventMapper.deleteByExample(example);
 
 			ChangeDataReturnBean changeDataReturnBean = setChangeDataReturnBean("1", "更新成功", true);

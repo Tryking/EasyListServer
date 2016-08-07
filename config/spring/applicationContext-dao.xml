@@ -31,7 +31,7 @@
 		<property name="configLocation" value="classpath:mybatis/sqlMapConfig.xml"></property>
 	</bean>
 	
-	<!-- mapper扫描器 -->
+	<!-- mapper扫描器：从mapper包中扫描出mapper接口，自动创建代理对象并且在spring容器中注册 -->
 	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
 		<property name="basePackage" value="com.EasyListServer.user.mapper"></property>
 		<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"></property>

@@ -64,17 +64,6 @@ public class userController {
 	@RequestMapping(value = "/changeData", produces = "text/html;charset=UTF-8")
 	@ResponseBody
 	public String changeData(TransferData transferData) {
-
-		// transferData.setMemberId("1111");
-		// transferData.setDate("20160729");
-		// transferData.setStartTimes("1111,111,1");
-		// transferData.setEndTimes("1111,111,1");
-		// transferData.setEventTypes("1111,111,1");
-		// transferData.setSpecificEvents("#^@#^@");
-
-		System.out.println("...................");
-		System.out.println("transferData:" + transferData);
-
 		ChangeDataReturnBean changeDataReturnBean = userService.changeData(transferData);
 
 		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").disableHtmlEscaping().create();
@@ -105,6 +94,21 @@ public class userController {
 		DayEventReturnBean dayEventReturnBean = userService.getEventByDate(memberId, date);
 		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").disableHtmlEscaping().create();
 		String json = gson.toJson(dayEventReturnBean);
+		return json;
+	}
+
+	/**
+	 * 
+	 * @param memberId
+	 * @param month
+	 * @return
+	 */
+	@RequestMapping(value = "/addOneWord", produces = "text/html;charset=UTF-8")
+	@ResponseBody
+	public String addOneWord(String memberId, String date, String dataType, String oneWord) {
+		ChangeDataReturnBean changeDataReturnBean = userService.addOneWord(memberId, date, dataType, oneWord);
+		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").disableHtmlEscaping().create();
+		String json = gson.toJson(changeDataReturnBean);
 		return json;
 	}
 

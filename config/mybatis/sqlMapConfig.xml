@@ -15,9 +15,8 @@ PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
 
 
 	<!-- 配置mapper 
-		使用spring和mybatis的整合包进行扫描，这里不用配置
+		使用spring和mybatis的整合包进行扫描，所以这里不用配置
 	-->
-	
 	
 </configuration>
 

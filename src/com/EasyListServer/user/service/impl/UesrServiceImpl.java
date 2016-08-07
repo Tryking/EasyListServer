@@ -25,8 +25,10 @@ import com.EasyListServer.user.pojo.UserExample;
 import com.EasyListServer.user.pojo.UserExample.Criteria;
 import com.EasyListServer.user.pojo.ViewMonthReturnBean;
 import com.EasyListServer.user.service.UserService;
+import com.EasyListServer.user.utils.Constants;
 import com.EasyListServer.user.utils.SplitUtil;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
+import com.sun.xml.internal.bind.v2.TODO;
 
 @Service
 public class UesrServiceImpl implements UserService {
@@ -66,11 +68,13 @@ public class UesrServiceImpl implements UserService {
 
 			String date = new DateTime().toString("yyyyMMdd");
 			List<Event> eventList = getEvent(user.getMemberid(), date);
+			String oneWord = getOneWord(user.getMemberid(), date);
 
 			DayEvent dayEvent = new DayEvent();
 			dayEvent.setDate(date);
 			dayEvent.setMemberId(user.getMemberid());
 			dayEvent.setEventList(eventList);
+			dayEvent.setOneWord(oneWord);
 			loginReturnBean.setDayEvent(dayEvent);
 			return loginReturnBean;
 
@@ -84,9 +88,11 @@ public class UesrServiceImpl implements UserService {
 
 		String date = new DateTime().toString("yyyyMMdd");
 		List<Event> eventList = getEvent(selectUser.getMemberid(), date);
+		String oneWord = getOneWord(selectUser.getMemberid(), date);
 
 		DayEvent dayEvent = new DayEvent();
 		dayEvent.setDate(date);
+		dayEvent.setOneWord(oneWord);
 		dayEvent.setMemberId(selectUser.getMemberid());
 		dayEvent.setEventList(eventList);
 
@@ -98,6 +104,24 @@ public class UesrServiceImpl implements UserService {
 		// loginReturnBean.setDayEvent(dayEvent);
 
 		return loginReturnBean;
+	}
+
+	/*
+	 * 获取一句话
+	 */
+	private String getOneWord(String memberid, String date) {
+		EventExample example = new EventExample();
+		EventExample.Criteria criteria = example.createCriteria();
+		criteria.andMemberidEqualTo(memberid);
+		criteria.andDateEqualTo(date);
+		criteria.andRecordEqualTo(Constants.oneWordSign);// 这个是一句话的
+		List<Event> list = eventMapper.selectByExample(example);
+		if (list.size() == 0) {
+			return "";
+		} else {
+			return list.get(0).getRecord();
+		}
+
 	}
 
 	@Override
@@ -191,25 +215,35 @@ public class UesrServiceImpl implements UserService {
 		com.EasyListServer.user.pojo.EventExample.Criteria criteria = example.createCriteria();
 		criteria.andMemberidEqualTo(memberId);
 		criteria.andDateEqualTo(date);
+		criteria.andEventtypesNotEqualTo(Integer.parseInt(Constants.oneWordSign));
+
 		List<Event> list = eventMapper.selectByExample(example);
 		if (list.isEmpty()) {
-			dayEvent.setResult("0");
-			dayEvent.setMsg("昨日没有添加数据");
+			dayEvent.setResult("1");
+			dayEvent.setMsg("此日没有添加数据");
 			return dayEvent;
 		}
+
+		// 这个是获取一句话的
+		String oneWord = getOneWord(memberId, date);
+
 		dayEvent.setResult("1");
 		dayEvent.setDate(date);
 		dayEvent.setMemberId(memberId);
 		dayEvent.setEventList(list);
-		dayEvent.setMsg("获取昨日数据成功");
+
+		dayEvent.setOneWord(oneWord);
+
+		dayEvent.setMsg("获取此日数据成功");
 		return dayEvent;
 	}
 
 	private List<Event> getEvent(String memberId, String date) {
 		EventExample example = new EventExample();
-		com.EasyListServer.user.pojo.EventExample.Criteria criteria = example.createCriteria();
+		EventExample.Criteria criteria = example.createCriteria();
 		criteria.andMemberidEqualTo(memberId);
 		criteria.andDateEqualTo(date);
+		criteria.andEventtypesNotEqualTo(Integer.parseInt(Constants.oneWordSign));// 这个是一句话的
 		List<Event> list = eventMapper.selectByExample(example);
 		return list;
 	}
@@ -253,6 +287,9 @@ public class UesrServiceImpl implements UserService {
 
 	}
 
+	/**
+	 * 获取用户一个月的事件
+	 */
 	@Override
 	public ViewMonthReturnBean viewMonthData(String memberId, String month) {
 		ViewMonthReturnBean viewMonthReturnBean = new ViewMonthReturnBean();
@@ -270,6 +307,7 @@ public class UesrServiceImpl implements UserService {
 		EventExample.Criteria criteria = example.createCriteria();
 		criteria.andMemberidEqualTo(memberId);
 		criteria.andDateLike(month + "%");
+		// 降序排列
 		example.setOrderByClause("DATE DESC");
 		List<Event> allMonthList = eventMapper.selectByExample(example);
 
@@ -278,42 +316,45 @@ public class UesrServiceImpl implements UserService {
 		if (allMonthList.size() != 0) {
 			String date = allMonthList.get(0).getDate();
 			List<Event> dayList = new ArrayList<>();
-
+			String oneWord = "";
 			for (Event event : allMonthList) {
-
 				if (event.getDate().equals(date)) {
-
-					dayList.add(event);
-
+					if (event.getEventtypes().equals(Integer.parseInt(Constants.oneWordSign))) {
+						oneWord = event.getRecord();
+					} else {
+						dayList.add(event);
+					}
 				} else {
-
 					DayEvent dayEvent = new DayEvent();
 					dayEvent.setDate(date);
 					dayEvent.setMemberId(memberId);
 
+					dayEvent.setOneWord(oneWord);
+
 					ArrayList<Event> arrayList = new ArrayList<>();
 					arrayList.addAll(dayList);
-
 					dayEvent.setEventList(arrayList);
-
 					monthList.add(dayEvent);
 
+					oneWord = "";
 					date = event.getDate();
-
 					dayList.clear();
-
-					dayList.add(event);
-
+					if (event.getEventtypes().equals(Integer.parseInt(Constants.oneWordSign))) {
+						oneWord = event.getRecord();
+					} else {
+						dayList.add(event);
+					}
 				}
 
 				if (event == allMonthList.get(allMonthList.size() - 1)) {
 					DayEvent dayEvent = new DayEvent();
 					dayEvent.setDate(date);
 					dayEvent.setMemberId(memberId);
+					dayEvent.setOneWord(oneWord);
+
 					dayEvent.setEventList(dayList);
 
 					monthList.add(dayEvent);
-
 				}
 
 			}
@@ -328,5 +369,50 @@ public class UesrServiceImpl implements UserService {
 		}
 
 		return viewMonthReturnBean;
+	}
+
+	@Override
+	public ChangeDataReturnBean addOneWord(String memberId, String date, String dataType, String oneWord) {
+		ChangeDataReturnBean changeDateReturnBean = new ChangeDataReturnBean();
+		if (date == null || memberId == null || dataType == null || oneWord == null || memberId.equals("")
+				|| date.equals("") || dataType.equals("") || !dataType.equals(Constants.oneWordSign)) {
+			changeDateReturnBean.setResult("0");
+			changeDateReturnBean.setMsg("参数错误");
+			return changeDateReturnBean;
+		}
+
+		EventExample e = new EventExample();
+		EventExample.Criteria c = e.createCriteria();
+		c.andMemberidEqualTo(memberId);
+		c.andDateEqualTo(date);
+		c.andEventtypesEqualTo(Integer.parseInt(dataType));
+		List<Event> list = eventMapper.selectByExample(e);
+
+		if (list == null || list.size() == 0) {
+			Event event = new Event();
+			event.setMemberid(memberId);
+			event.setDate(date);
+			event.setEventtypes(Integer.parseInt(dataType));
+			event.setRecord(oneWord);
+			eventMapper.insert(event);
+			System.out.println("插入成功");
+		} else {
+			EventExample example = new EventExample();
+			EventExample.Criteria criteria = example.createCriteria();
+			criteria.andDateEqualTo(date);
+			criteria.andMemberidEqualTo(memberId);
+			criteria.andEventtypesEqualTo(Integer.parseInt(Constants.oneWordSign));
+
+			Event event = new Event();
+			event.setRecord(oneWord);
+
+			// eventMapper.updateByExample(event, example);
+			// 上面的不能用，要只改选中的
+			eventMapper.updateByExampleSelective(event, example);
+			System.out.println("更新成功");
+		}
+
+		ChangeDataReturnBean changeDataReturnBean = setChangeDataReturnBean("1", "一句话更新成功", true);
+		return changeDataReturnBean;
 	}
 }

@@ -48,4 +48,13 @@ public interface UserService {
 	 * @return
 	 */
 	ViewMonthReturnBean viewMonthData(String memberId, String month);
+
+	/**
+	 * 添加每日一句，只能添加今日和昨日的
+	 * @param memberId
+	 * @param date
+	 * @param oneWord
+	 * @return
+	 */
+	ChangeDataReturnBean addOneWord(String memberId, String date,String dataType, String oneWord);
 }

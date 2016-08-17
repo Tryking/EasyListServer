@@ -14,13 +14,17 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.EasyListServer.user.pojo.AppVersionReturnBean;
+import com.EasyListServer.user.pojo.BaseBean;
 import com.EasyListServer.user.pojo.ChangeDataReturnBean;
 import com.EasyListServer.user.pojo.DayEventReturnBean;
 import com.EasyListServer.user.pojo.Event;
 import com.EasyListServer.user.pojo.LoginReturnBean;
+import com.EasyListServer.user.pojo.ShareUrlRetrunBean;
 import com.EasyListServer.user.pojo.TransferData;
 import com.EasyListServer.user.pojo.User;
 import com.EasyListServer.user.pojo.ViewMonthReturnBean;
+import com.EasyListServer.user.service.MessageService;
 import com.EasyListServer.user.service.UserService;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -30,6 +34,9 @@ public class userController {
 
 	@Autowired
 	private UserService userService;
+	
+	@Autowired
+	private MessageService messageService;
 
 	/**
 	 * 登陆之后并且显示全部event，只能显示今天的event
@@ -109,6 +116,68 @@ public class userController {
 		ChangeDataReturnBean changeDataReturnBean = userService.addOneWord(memberId, date, dataType, oneWord);
 		Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").disableHtmlEscaping().create();
 		String json = gson.toJson(changeDataReturnBean);
+		return json;
+	}
+	
+	/**
+	 * 查询版本信息
+	 * @param deviceType
+	 * @param appName
+	 * @return
+	 */
+	@RequestMapping(value = "/appVersion", produces = "text/html;charset=UTF-8")
+	@ResponseBody
+	public String appVersion(String deviceType, String appName){
+		System.out.println("deviceType:"+deviceType);
+		System.out.println("appName:"+appName);
+//		deviceType = "android";
+//		appName = "EasyList";
+		AppVersionReturnBean appVersionReturnBean = messageService.appVersion(deviceType, appName);
+		Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+		String json = gson.toJson(appVersionReturnBean);
+		return json;
+	}
+	
+	/**
+	 * 修改个性签名
+	 * @param memberId
+	 * @param signature
+	 * @return
+	 */
+	@RequestMapping(value = "/updateParam", produces = "text/html;charset=UTF-8")
+	@ResponseBody
+	public String updateParam(String memberId, String type, String param){
+		
+//		memberId = "1111";
+//		type = "5";
+//		param = "";
+		
+		System.out.println("memberId:"+memberId);
+		System.out.println("type:"+type);
+		System.out.println("param:"+param);
+		
+		BaseBean baseBean = messageService.updateParam(memberId, type, param);
+		Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+		String json = gson.toJson(baseBean);
+		return json;
+	}
+	
+	/**
+	 * 分享链接
+	 * @param memberId
+	 * @return
+	 */
+	@RequestMapping(value = "/getShareUrl", produces = "text/html;charset=UTF-8")
+	@ResponseBody
+	public String getShareUrl(String memberId){
+		
+//		memberId = "1";
+		
+		System.out.println("memberId:"+memberId);
+		
+		ShareUrlRetrunBean shareUrlRetrunBean = messageService.getShareUrl(memberId);
+		Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+		String json = gson.toJson(shareUrlRetrunBean);
 		return json;
 	}
 

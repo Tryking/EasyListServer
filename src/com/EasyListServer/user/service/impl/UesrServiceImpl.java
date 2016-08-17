@@ -172,6 +172,7 @@ public class UesrServiceImpl implements UserService {
 		EventExample.Criteria delCriteria = example.createCriteria();
 		delCriteria.andMemberidEqualTo(transferData.getMemberId());
 		delCriteria.andDateEqualTo(transferData.getDate());
+		delCriteria.andEventtypesNotEqualTo(Integer.parseInt(Constants.oneWordSign));
 		eventMapper.deleteByExample(example);
 
 		// È«²¿²åÈë
